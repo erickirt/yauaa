@@ -6,7 +6,7 @@ NEXT RELEASE
 - UDFs;
   - Nifi UDF works on Nifi 1.28.1 and Nifi 2.8.0
 - New/improved detections:
-  - ...
+  - Robots: OpenAI
 
 v8.0.0
 ===

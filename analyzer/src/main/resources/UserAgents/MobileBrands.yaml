@@ -613,6 +613,8 @@ config:
       "One"                     : "OnePlus"
       "DN21"                    : "OnePlus"
 
+      "OAI-"                    : "OpenAI"
+
       "A1601"                   : "Oppo"
       "A37f"                    : "Oppo"
       "CPH1"                    : "Oppo"
