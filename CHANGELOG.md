@@ -8,6 +8,7 @@ NEXT RELEASE
 - New/improved detections:
   - Robots: OpenAI
   - KakaoTalk
+  - Hisense HiBrowser, Sraf Browser and Hisense Vidaa platform running on TVs of several brands.
 
 v8.0.0
 ===

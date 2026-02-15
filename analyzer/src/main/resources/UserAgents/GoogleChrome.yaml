@@ -79,6 +79,8 @@ config:
       'YaBrowser'       : 'Yandex Browser'
       'EkiohFlow'       : 'Ekioh Flow'
       'QIHU'            : 'Qihoo 360 Safe Browser'
+      'Odin'            : 'HiBrowser'   # https://play.google.com/store/apps/details?id=com.hisense.odinbrowser&hl=en
+      'SRAF'            : 'Seraphic Sraf Browser'
 
 - lookup: # Used in the post ClientHint processing code (Java)
     name: 'ClientHintTagToNameMapping'

@@ -1,0 +1,1587 @@
+# $schema: https://yauaa.basjes.nl/v1/YauaaConfig.json
+#
+# Yet Another UserAgent Analyzer
+# Copyright (C) 2013-2026 Niels Basjes
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an AS IS BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+config:
+
+# Specs I found on the internet:
+
+# For VIDAA platforms, there are at least one “Hisense”(2019 or earlier) or "VIDAA"(2020 or later) keywords.
+# The rest is changing, such as the SDK version of the chrome kernel version, model, and software version.
+# JavaScript application can get the string from the HTML DOM property, navigator.userAgent.
+# The same string will be included in the HTTP request User-Agent header.
+#
+# The following is an example of the User Agent strings Example,
+# 2019 or earlier:
+#     Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Odin/3.2987.2.10 Safari/537.36 Model/Hisense-$Platform ($Brand;$modelName;$softVersion)
+# 2020 or later:
+#     Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.65 Safari/537.36 OPR/46.0.2207.0 OMI/4.20.0.378.Catcher2.28 Model/Hisense-$chip VIDAA/4.0($BrandName;SmartTV;$modelname;$chipset/$firmware;$Resolution)
+#
+#  Model/Hisense-$chip is a constant strings, identify the manufacturer information.
+#  The 6886U4 is Model/Hisense-MSD6886, and the 9602 platform is Model/Hisense-MT9602
+#  The following table illustrates the fields in User Agent string and User-Agent HTTP header.
+#
+#  Brandname: brand name
+#  SmartTV: constant strings
+#  modelName: TV model name
+#  $chipset: The 6886U4 is mstar6886, the 9602 platform is mt9602
+#  firmware: firmware version
+#  $Resolution:’UHD’ if platform support UHD, else FHD for 1080p and HD for 720p
+
+#  User Agent strings may be different for different chips.
+#
+#  Chips         User Agent strings
+#  MT5658        Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36 OPR/40.0.2207.0 OMI/4.9.0.237.Martell-2.312 Model/Hisense-MT5658-SDK4-9 (;Hisense;SmartTV;V0000.01.00a.J0727;HE55A6500UWTS)
+#  MT5659        Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36 OPR/46.0.2207.0 OMI/4.11.3.57.Martell-3.103 Model/Hisense-MT5659-SDK4-11 (;Hisense;SmartTV;V0000.01.00A.J0802;HE39A5600FWTS)
+#  MSD6586       Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36 OPR/40.0.2207.0 OMI/4.9.0.183.CATCH-412.26 Model
+#  MSD6886AU U3  Mozilla/5.0 (X11; Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Odin/3.2987.2.10 Safari/537.36 (Hisense;55A6502EA;V0000.01.00a.I1214) MSD6886
+#  MSD6886EU U3  Mozilla/5.0 (X11; Linux x86_64;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36 SRAF/4.0 Hisense-MSD6886(Hisense;HE55A7000EUWTS;V0000.01.00A.J0828)
+#  MSD6886EU U4  Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.65 Safari/537.36 OPR/46.0.2207.0 OMI/4.20.0.378.Catcher2.28 Model/Hisense-MSD6886 VIDAA/4.0(Hisense;SmartTV;HE55A6900FUWTS;mstar6886/V0000.01.00a.J1105;UHD)
+#  MSD6886AU U4  Mozilla/5.0 (X11; Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Odin/3.2987.2.10 Safari/537.36 Model/Hisense-MSD6886 VIDAA/4.0(Hisense;SmartTV;HA65U6F2UWTG;mstar6886/V0000.01.00B.J1230;UHD)
+
+- matcher:
+    variable:
+      - 'Vidaa : agent.product.name="Model"^.version[1]="Hisense"^'
+    require:
+      - '@Vidaa.(1)comments.(3)entry="SmartTV"'
+    extract:
+      - 'DeviceClass                         :     1000 :"TV"'
+      - 'DeviceBrand                         :      101 :@Vidaa.(1)comments.(2)entry'
+      - 'DeviceName                          :      101 :@Vidaa.(1)comments.(5)entry'
+      - 'DeviceVersion                       :      101 :@Vidaa.version[2-]' # Is  "chipset - SDK"
+      - 'OperatingSystemClass                :     1000 :"Embedded"'
+      - 'OperatingSystemName                 :     1000 :"Vidaa"'
+      - 'OperatingSystemVersion              :     1000 :"<<<null>>>"'
+
+
+- matcher:
+    variable:
+      - 'Vidaa : agent.product.name="Vidaa"^'
+    require:
+      - '@Vidaa.(1)comments.(2)entry="SmartTV"'
+    extract:
+       - 'DeviceClass                         :     1000 :"TV"'
+       - 'DeviceBrand                         :      101 :@Vidaa.(1)comments.(1)entry'
+       - 'DeviceName                          :      101 :@Vidaa.(1)comments.(3)entry'
+       - 'DeviceVersion                       :      101 :@Vidaa.(1)comments.(4)entry' # Is  "chipset / firmwareversion"
+       - 'OperatingSystemClass                :     1000 :"Embedded"'
+       - 'OperatingSystemName                 :     1000 :"Vidaa"'
+       - 'OperatingSystemVersion              :     1000 :@Vidaa.version'
+
+- matcher:
+    variable:
+      - 'HiSense : agent.product.name[1]="HiSense"^'
+    extract:
+      - 'DeviceClass                         :     1000 :"TV"'
+      - 'DeviceBrand                         :      101 :@HiSense.(1)comments.(1)entry'
+      - 'DeviceName                          :      101 :@HiSense.(1)comments.(2)entry'
+      - 'DeviceVersion                       :      101 :@HiSense.(1)comments.(3)entry'
+      - 'OperatingSystemClass                :      999 :"Embedded"'
+      - 'OperatingSystemName                 :      999 :"Vidaa"'
+      - 'OperatingSystemVersion              :      999 :"<<<null>>>"'
+
+
+- matcher:
+    variable:
+      - 'Safari : agent.product.name="Safari"^'
+    require:
+      - 'agent.product.name="Odin"'
+    extract:
+      - 'DeviceClass                         :     1000 :"TV"'
+      - 'DeviceBrand                         :      101 :@Safari.(1)comments.(1)entry'
+      - 'DeviceName                          :      101 :@Safari.(1)comments.(2)entry'
+      - 'DeviceVersion                       :      101 :@Safari.(1)comments.(3)entry'
+      - 'OperatingSystemClass                :      999 :"Embedded"'
+      - 'OperatingSystemName                 :      999 :"Vidaa"'
+      - 'OperatingSystemVersion              :      999 :"<<<null>>>"'
+
+# The cases found in the `specs`
+- test:
+    input:
+      User-Agent: 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36 OPR/40.0.2207.0 OMI/4.9.0.237.Martell-2.312 Model/Hisense-MT5658-SDK4-9 (;Hisense;SmartTV;V0000.01.00a.J0727;HE55A6500UWTS)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense HE55A6500UWTS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'MT5658-SDK4-9'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '??'
+      OperatingSystemVersionMajor          : '??'
+      OperatingSystemNameVersion           : 'Vidaa ??'
+      OperatingSystemNameVersionMajor      : 'Vidaa ??'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '53.0'
+      LayoutEngineVersionMajor             : '53'
+      LayoutEngineNameVersion              : 'Blink 53.0'
+      LayoutEngineNameVersionMajor         : 'Blink 53'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '40.0.2207.0'
+      AgentVersionMajor                    : '40'
+      AgentNameVersion                     : 'Opera 40.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 40'
+
+
+- test:
+    input:
+      User-Agent: 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36 OPR/46.0.2207.0 OMI/4.11.3.57.Martell-3.103 Model/Hisense-MT5659-SDK4-11 (;Hisense;SmartTV;V0000.01.00A.J0802;HE39A5600FWTS)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense HE39A5600FWTS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'MT5659-SDK4-11'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '??'
+      OperatingSystemVersionMajor          : '??'
+      OperatingSystemNameVersion           : 'Vidaa ??'
+      OperatingSystemNameVersionMajor      : 'Vidaa ??'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '59.0'
+      LayoutEngineVersionMajor             : '59'
+      LayoutEngineNameVersion              : 'Blink 59.0'
+      LayoutEngineNameVersionMajor         : 'Blink 59'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+# This example violates their own spec: It does NOT contain "Hisense" or "Vidaa" at all --> Probably a bad PDF I found --> Ignoring
+#- test:
+#    input:
+#      User-Agent: 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36 OPR/40.0.2207.0 OMI/4.9.0.183.CATCH-412.26 Model'
+
+- test:
+    input:
+      User-Agent: 'Mozilla/5.0 (X11; Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Odin/3.2987.2.10 Safari/537.36 (Hisense;55A6502EA;V0000.01.00a.I1214) MSD6886'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense 55A6502EA'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'V0000.01.00a.I1214'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '??'
+      OperatingSystemVersionMajor          : '??'
+      OperatingSystemNameVersion           : 'Vidaa ??'
+      OperatingSystemNameVersionMajor      : 'Vidaa ??'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '57.0'
+      LayoutEngineVersionMajor             : '57'
+      LayoutEngineNameVersion              : 'Blink 57.0'
+      LayoutEngineNameVersionMajor         : 'Blink 57'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '3.2987.2.10'
+      AgentVersionMajor                    : '3'
+      AgentNameVersion                     : 'HiBrowser 3.2987.2.10'
+      AgentNameVersionMajor                : 'HiBrowser 3'
+
+
+- test:
+    input:
+      User-Agent: 'Mozilla/5.0 (X11; Linux x86_64;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36 SRAF/4.0 Hisense-MSD6886(Hisense;HE55A7000EUWTS;V0000.01.00A.J0828)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense HE55A7000EUWTS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'Intel x86_64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'V0000.01.00A.J0828'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '??'
+      OperatingSystemVersionMajor          : '??'
+      OperatingSystemNameVersion           : 'Vidaa ??'
+      OperatingSystemNameVersionMajor      : 'Vidaa ??'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '47.0'
+      LayoutEngineVersionMajor             : '47'
+      LayoutEngineNameVersion              : 'Blink 47.0'
+      LayoutEngineNameVersionMajor         : 'Blink 47'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Seraphic Sraf Browser'
+      AgentVersion                         : '4.0'
+      AgentVersionMajor                    : '4'
+      AgentNameVersion                     : 'Seraphic Sraf Browser 4.0'
+      AgentNameVersionMajor                : 'Seraphic Sraf Browser 4'
+
+
+- test:
+    input:
+      User-Agent: 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.65 Safari/537.36 OPR/46.0.2207.0 OMI/4.20.0.378.Catcher2.28 Model/Hisense-MSD6886 VIDAA/4.0(Hisense;SmartTV;HE55A6900FUWTS;mstar6886/V0000.01.00a.J1105;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense HE55A6900FUWTS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'mstar6886/V0000.01.00a.J1105'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '4.0'
+      OperatingSystemVersionMajor          : '4'
+      OperatingSystemNameVersion           : 'Vidaa 4.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 4'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '77.0'
+      LayoutEngineVersionMajor             : '77'
+      LayoutEngineNameVersion              : 'Blink 77.0'
+      LayoutEngineNameVersionMajor         : 'Blink 77'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent: 'Mozilla/5.0 (X11; Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Odin/3.2987.2.10 Safari/537.36 Model/Hisense-MSD6886 VIDAA/4.0(Hisense;SmartTV;HA65U6F2UWTG;mstar6886/V0000.01.00B.J1230;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense HA65U6F2UWTG'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'mstar6886/V0000.01.00B.J1230'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '4.0'
+      OperatingSystemVersionMajor          : '4'
+      OperatingSystemNameVersion           : 'Vidaa 4.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 4'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '57.0'
+      LayoutEngineVersionMajor             : '57'
+      LayoutEngineNameVersion              : 'Blink 57.0'
+      LayoutEngineNameVersionMajor         : 'Blink 57'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '3.2987.2.10'
+      AgentVersionMajor                    : '3'
+      AgentNameVersion                     : 'HiBrowser 3.2987.2.10'
+      AgentNameVersionMajor                : 'HiBrowser 3'
+
+# ==================================================================================
+
+# The part at the end is something that was encrypted (probably with openssl) and then base64 encoded.
+# I changed it to protect the original owner of this device
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36 OPR/46.0.2207.0 OMI/4.11.3.57.Martell-3.136 Model/Hisense-MT5659-SDK4-11 (;Hisense;SmartTV;V0000.01.00A.N0328;HE32A5600HWTS) FXM-U2FsdGVkX18aLf3hR3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-END'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense HE32A5600HWTS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'MT5659-SDK4-11'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '??'
+      OperatingSystemVersionMajor          : '??'
+      OperatingSystemNameVersion           : 'Vidaa ??'
+      OperatingSystemNameVersionMajor      : 'Vidaa ??'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '59.0'
+      LayoutEngineVersionMajor             : '59'
+      LayoutEngineNameVersion              : 'Blink 59.0'
+      LayoutEngineNameVersionMajor         : 'Blink 59'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36 OPR/46.0.2207.0 OMI/4.20.3.54.Catcher2.187 Model/Hisense-MSD6886 VIDAA/4.0(Hisense;SmartTV;HE50A6900FUWTS;mstar6886/V0000.01.00Q.L1008;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense HE50A6900FUWTS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'mstar6886/V0000.01.00Q.L1008'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '4.0'
+      OperatingSystemVersionMajor          : '4'
+      OperatingSystemNameVersion           : 'Vidaa 4.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 4'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '77.0'
+      LayoutEngineVersionMajor             : '77'
+      LayoutEngineNameVersion              : 'Blink 77.0'
+      LayoutEngineNameVersionMajor         : 'Blink 77'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36 OPR/46.0.2207.0 OMI/4.20.3.54.Catcher2.196 Model/Hisense-MSD6886 VIDAA/4.0(DEXP;SmartTV;HE65A6109FUWTS_1001;mstar6886/V0000.01.00L.L1103;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Dexp HE65A6109FUWTS 1001'
+      DeviceBrand                          : 'Dexp'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'mstar6886/V0000.01.00L.L1103'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '4.0'
+      OperatingSystemVersionMajor          : '4'
+      OperatingSystemNameVersion           : 'Vidaa 4.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 4'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '77.0'
+      LayoutEngineVersionMajor             : '77'
+      LayoutEngineNameVersion              : 'Blink 77.0'
+      LayoutEngineNameVersionMajor         : 'Blink 77'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36 OPR/46.0.2207.0 OMI/4.20.3.54.Catcher2.196 Model/Hisense-MSD6886 VIDAA/4.0(TOSHIBA;SmartTV;55C351N;mstar6886/V0000.01.00I.P0219;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Toshiba 55C351N'
+      DeviceBrand                          : 'Toshiba'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'mstar6886/V0000.01.00I.P0219'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '4.0'
+      OperatingSystemVersionMajor          : '4'
+      OperatingSystemNameVersion           : 'Vidaa 4.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 4'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '77.0'
+      LayoutEngineVersionMajor             : '77'
+      LayoutEngineNameVersion              : 'Blink 77.0'
+      LayoutEngineNameVersionMajor         : 'Blink 77'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36 OPR/46.0.2207.0 OMI/4.20.3.54.Catcher2.196 Model/Hisense-MSD6886 VIDAA/4.0(TOSHIBA;SmartTV;TE50A6110FUWTS_0010;mstar6886/V0000.01.00B.P0220;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Toshiba TE50A6110FUWTS 0010'
+      DeviceBrand                          : 'Toshiba'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'mstar6886/V0000.01.00B.P0220'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '4.0'
+      OperatingSystemVersionMajor          : '4'
+      OperatingSystemNameVersion           : 'Vidaa 4.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 4'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '77.0'
+      LayoutEngineVersionMajor             : '77'
+      LayoutEngineNameVersion              : 'Blink 77.0'
+      LayoutEngineNameVersionMajor         : 'Blink 77'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36 OPR/46.0.2207.0 OMI/4.20.3.54.Catcher2.210 Model/Hisense-MSD6886 VIDAA/4.0(DEXP;SmartTV;HE65A6109FUWTS_1001;mstar6886/V0000.01.00A.N0530;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Dexp HE65A6109FUWTS 1001'
+      DeviceBrand                          : 'Dexp'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'mstar6886/V0000.01.00A.N0530'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '4.0'
+      OperatingSystemVersionMajor          : '4'
+      OperatingSystemNameVersion           : 'Vidaa 4.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 4'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '77.0'
+      LayoutEngineVersionMajor             : '77'
+      LayoutEngineNameVersion              : 'Blink 77.0'
+      LayoutEngineNameVersionMajor         : 'Blink 77'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36 OPR/46.0.2207.0 OMI/4.20.3.54.Catcher2.210 Model/Hisense-MSD6886 VIDAA/4.0(DOFFLER;SmartTV;65A521EEVS;mstar6886/V0000.01.00A.N0530;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Doffler 65A521EEVS'
+      DeviceBrand                          : 'Doffler'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'mstar6886/V0000.01.00A.N0530'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '4.0'
+      OperatingSystemVersionMajor          : '4'
+      OperatingSystemNameVersion           : 'Vidaa 4.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 4'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '77.0'
+      LayoutEngineVersionMajor             : '77'
+      LayoutEngineNameVersion              : 'Blink 77.0'
+      LayoutEngineNameVersionMajor         : 'Blink 77'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36 OPR/46.0.2207.0 OMI/4.20.3.54.Catcher2.210 Model/Hisense-MSD6886 VIDAA/4.0(Hisense;SmartTV;55A56EEVS_0002;mstar6886/V0000.01.00F.P0220;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense 55A56EEVS 0002'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'mstar6886/V0000.01.00F.P0220'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '4.0'
+      OperatingSystemVersionMajor          : '4'
+      OperatingSystemNameVersion           : 'Vidaa 4.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 4'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '77.0'
+      LayoutEngineVersionMajor             : '77'
+      LayoutEngineNameVersion              : 'Blink 77.0'
+      LayoutEngineNameVersionMajor         : 'Blink 77'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36 OPR/46.0.2207.0 OMI/4.20.3.54.Catcher2.210 Model/Hisense-MSD6886 VIDAA/4.0(Hisense;SmartTV;55A56EEVS;mstar6886/V0000.01.00F.P0220;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense 55A56EEVS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'mstar6886/V0000.01.00F.P0220'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '4.0'
+      OperatingSystemVersionMajor          : '4'
+      OperatingSystemNameVersion           : 'Vidaa 4.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 4'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '77.0'
+      LayoutEngineVersionMajor             : '77'
+      LayoutEngineNameVersion              : 'Blink 77.0'
+      LayoutEngineNameVersionMajor         : 'Blink 77'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36 OPR/46.0.2207.0 OMI/4.20.3.54.Catcher2.210 Model/Hisense-MSD6886 VIDAA/4.0(TOSHIBA;SmartTV;55C351N;mstar6886/V0000.01.00W.P0305;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Toshiba 55C351N'
+      DeviceBrand                          : 'Toshiba'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'mstar6886/V0000.01.00W.P0305'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '4.0'
+      OperatingSystemVersionMajor          : '4'
+      OperatingSystemNameVersion           : 'Vidaa 4.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 4'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '77.0'
+      LayoutEngineVersionMajor             : '77'
+      LayoutEngineNameVersion              : 'Blink 77.0'
+      LayoutEngineNameVersionMajor         : 'Blink 77'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36 OPR/46.0.2207.0 OMI/4.20.3.54.Catcher2.210 Model/Hisense-MSD6886 VIDAA/4.0(TOSHIBA;SmartTV;TE50A6110FUWTS_0010;mstar6886/V0000.01.00W.P0305;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Toshiba TE50A6110FUWTS 0010'
+      DeviceBrand                          : 'Toshiba'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'mstar6886/V0000.01.00W.P0305'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '4.0'
+      OperatingSystemVersionMajor          : '4'
+      OperatingSystemNameVersion           : 'Vidaa 4.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 4'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '77.0'
+      LayoutEngineVersionMajor             : '77'
+      LayoutEngineNameVersion              : 'Blink 77.0'
+      LayoutEngineNameVersionMajor         : 'Blink 77'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.140 Safari/537.36 OPR/46.0.2207.0 OMI/4.21.2.50.Honey.168 Model/Hisense-NT72671D VIDAA/5.0(TOSHIBA;SmartTV;55M550N;NT72671/V0000.01.00S.L0618;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Toshiba 55M550N'
+      DeviceBrand                          : 'Toshiba'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'NT72671/V0000.01.00S.L0618'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '5.0'
+      OperatingSystemVersionMajor          : '5'
+      OperatingSystemNameVersion           : 'Vidaa 5.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 5'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '84.0'
+      LayoutEngineVersionMajor             : '84'
+      LayoutEngineNameVersion              : 'Blink 84.0'
+      LayoutEngineNameVersionMajor         : 'Blink 84'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.140 Safari/537.36 OPR/46.0.2207.0 OMI/4.21.2.50.Honey.182 Model/Hisense-NT72671D VIDAA/5.0(Hisense;SmartTV;43A53FEVS;NT72671/V0000.01.00S.L0923;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense 43A53FEVS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'NT72671/V0000.01.00S.L0923'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '5.0'
+      OperatingSystemVersionMajor          : '5'
+      OperatingSystemNameVersion           : 'Vidaa 5.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 5'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '84.0'
+      LayoutEngineVersionMajor             : '84'
+      LayoutEngineNameVersion              : 'Blink 84.0'
+      LayoutEngineNameVersionMajor         : 'Blink 84'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.140 Safari/537.36 OPR/46.0.2207.0 OMI/4.21.2.50.Honey.189 Model/Hisense-NT72671D VIDAA/5.0(LOEWE;SmartTV;48A81FEVS;NT72671/V0000.01.00V.M0411;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Loewe 48A81FEVS'
+      DeviceBrand                          : 'Loewe'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'NT72671/V0000.01.00V.M0411'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '5.0'
+      OperatingSystemVersionMajor          : '5'
+      OperatingSystemNameVersion           : 'Vidaa 5.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 5'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '84.0'
+      LayoutEngineVersionMajor             : '84'
+      LayoutEngineNameVersion              : 'Blink 84.0'
+      LayoutEngineNameVersionMajor         : 'Blink 84'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.140 Safari/537.36 OPR/46.0.2207.0 OMI/4.21.2.50.Honey.189 Model/Hisense-NT72671D VIDAA/5.0(We by loewe;SmartTV;32A71FEVS;NT72671/V0000.01.00O.M0412;FHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'WE BY Loewe 32A71FEVS'
+      DeviceBrand                          : 'WE BY Loewe'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'NT72671/V0000.01.00O.M0412'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '5.0'
+      OperatingSystemVersionMajor          : '5'
+      OperatingSystemNameVersion           : 'Vidaa 5.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 5'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '84.0'
+      LayoutEngineVersionMajor             : '84'
+      LayoutEngineNameVersion              : 'Blink 84.0'
+      LayoutEngineNameVersionMajor         : 'Blink 84'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.140 Safari/537.36 OPR/46.0.2207.0 OMI/4.21.2.50.Honey.189 Model/Hisense-NT72671D VIDAA/5.0(TOSHIBA;SmartTV;43C350KE_0002;NT72671/V0000.01.00A.M0402;UHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Toshiba 43C350KE 0002'
+      DeviceBrand                          : 'Toshiba'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'NT72671/V0000.01.00A.M0402'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '5.0'
+      OperatingSystemVersionMajor          : '5'
+      OperatingSystemNameVersion           : 'Vidaa 5.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 5'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '84.0'
+      LayoutEngineVersionMajor             : '84'
+      LayoutEngineNameVersion              : 'Blink 84.0'
+      LayoutEngineNameVersionMajor         : 'Blink 84'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.140 Safari/537.36 OPR/46.0.2207.0 OMI/4.21.2.50.Honey.220 Model/Hisense-NT72671D VIDAA/6.0(Hisense;SmartTV;55U7GEVS;NT72671/V0000.06.12K.N1213;UHD;55U7GE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense 55U7GEVS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'NT72671/V0000.06.12K.N1213'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '6.0'
+      OperatingSystemVersionMajor          : '6'
+      OperatingSystemNameVersion           : 'Vidaa 6.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 6'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '84.0'
+      LayoutEngineVersionMajor             : '84'
+      LayoutEngineNameVersion              : 'Blink 84.0'
+      LayoutEngineNameVersionMajor         : 'Blink 84'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.140 Safari/537.36 OPR/46.0.2207.0 OMI/4.21.2.50.Honey.220 Model/Hisense-NT72671D VIDAA/6.0(TOSHIBA;SmartTV;43C350KE;NT72671/V0000.06.12J.N0807;UHD;43C350KE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Toshiba 43C350KE'
+      DeviceBrand                          : 'Toshiba'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'NT72671/V0000.06.12J.N0807'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '6.0'
+      OperatingSystemVersionMajor          : '6'
+      OperatingSystemNameVersion           : 'Vidaa 6.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 6'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '84.0'
+      LayoutEngineVersionMajor             : '84'
+      LayoutEngineNameVersion              : 'Blink 84.0'
+      LayoutEngineNameVersionMajor         : 'Blink 84'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.140 Safari/537.36 OPR/46.0.2207.0 OMI/4.21.2.50.Honey.220 Model/Hisense-NT72671D VIDAA/6.0(Welcome;SmartTV;50C350KE;NT72671/V0000.06.12K.N1213;UHD;50C350KE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Welcome 50C350KE'
+      DeviceBrand                          : 'Welcome' # Unable to locate anything about this brand.
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'NT72671/V0000.06.12K.N1213'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '6.0'
+      OperatingSystemVersionMajor          : '6'
+      OperatingSystemNameVersion           : 'Vidaa 6.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 6'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '84.0'
+      LayoutEngineVersionMajor             : '84'
+      LayoutEngineNameVersion              : 'Blink 84.0'
+      LayoutEngineNameVersionMajor         : 'Blink 84'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.140 Safari/537.36 OPR/46.0.2207.0 OMI/4.21.4.112.Catcher4.74 Model/Hisense-MT9602 VIDAA/5.0(TOSHIBA;SmartTV;43V35KE;MTK9602/V0000.01.00R.M0628;FHD)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Toshiba 43V35KE'
+      DeviceBrand                          : 'Toshiba'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'MTK9602/V0000.01.00R.M0628'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '5.0'
+      OperatingSystemVersionMajor          : '5'
+      OperatingSystemNameVersion           : 'Vidaa 5.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 5'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '84.0'
+      LayoutEngineVersionMajor             : '84'
+      LayoutEngineNameVersion              : 'Blink 84.0'
+      LayoutEngineNameVersionMajor         : 'Blink 84'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.140 Safari/537.36 OPR/46.0.2207.0 OMI/4.21.4.112.Catcher4.81 Model/Hisense-MT9602 VIDAA/5.0(Hisense;SmartTV;55A53FEVS;MTK9602/V0000.01.00P.M0826;UHD;55A5FE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense 55A53FEVS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'MTK9602/V0000.01.00P.M0826'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '5.0'
+      OperatingSystemVersionMajor          : '5'
+      OperatingSystemNameVersion           : 'Vidaa 5.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 5'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '84.0'
+      LayoutEngineVersionMajor             : '84'
+      LayoutEngineNameVersion              : 'Blink 84.0'
+      LayoutEngineNameVersionMajor         : 'Blink 84'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'Opera'
+      AgentVersion                         : '46.0.2207.0'
+      AgentVersionMajor                    : '46'
+      AgentNameVersion                     : 'Opera 46.0.2207.0'
+      AgentNameVersionMajor                : 'Opera 46'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Odin/100.4896.4.10 Safari/537.36 Model/VIDAA-MTK9618 VIDAA/7.0(Hisense;SmartTV;55A67GEVS;MTK9618/V0000.07.50R.N0822;UHD;55A67GE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense 55A67GEVS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'MTK9618/V0000.07.50R.N0822'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '7.0'
+      OperatingSystemVersionMajor          : '7'
+      OperatingSystemNameVersion           : 'Vidaa 7.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 7'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '100.0'
+      LayoutEngineVersionMajor             : '100'
+      LayoutEngineNameVersion              : 'Blink 100.0'
+      LayoutEngineNameVersionMajor         : 'Blink 100'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '100.4896.4.10'
+      AgentVersionMajor                    : '100'
+      AgentNameVersion                     : 'HiBrowser 100.4896.4.10'
+      AgentNameVersionMajor                : 'HiBrowser 100'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Odin/100.4896.4.10 Safari/537.36 Model/VIDAA-MTK9618 VIDAA/7.0(TOSHIBA;SmartTV;55Z670ME;MTK9618/V0000.07.50A.O0607;UHD;55Z670ME;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Toshiba 55Z670ME'
+      DeviceBrand                          : 'Toshiba'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'MTK9618/V0000.07.50A.O0607'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '7.0'
+      OperatingSystemVersionMajor          : '7'
+      OperatingSystemNameVersion           : 'Vidaa 7.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 7'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '100.0'
+      LayoutEngineVersionMajor             : '100'
+      LayoutEngineNameVersion              : 'Blink 100.0'
+      LayoutEngineNameVersionMajor         : 'Blink 100'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '100.4896.4.10'
+      AgentVersionMajor                    : '100'
+      AgentNameVersion                     : 'HiBrowser 100.4896.4.10'
+      AgentNameVersionMajor                : 'HiBrowser 100'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Odin/100.4896.4.10 Safari/537.36 Model/VIDAA-NT72690 VIDAA/7.0(GALATEC;SmartTV;VT1243FD2;NT72690/V0000.07.00L.N1026;FHD;VT1243F2;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Galatec VT1243FD2'
+      DeviceBrand                          : 'Galatec'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'NT72690/V0000.07.00L.N1026'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '7.0'
+      OperatingSystemVersionMajor          : '7'
+      OperatingSystemNameVersion           : 'Vidaa 7.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 7'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '100.0'
+      LayoutEngineVersionMajor             : '100'
+      LayoutEngineNameVersion              : 'Blink 100.0'
+      LayoutEngineNameVersionMajor         : 'Blink 100'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '100.4896.4.10'
+      AgentVersionMajor                    : '100'
+      AgentNameVersion                     : 'HiBrowser 100.4896.4.10'
+      AgentNameVersionMajor                : 'HiBrowser 100'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Odin/100.4896.4.10 Safari/537.36 Model/VIDAA-NT72690 VIDAA/7.0(Hisense;SmartTV;32A35HEVS;NT72690/V0000.07.00L.N1129;HD;32A3HE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense 32A35HEVS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'NT72690/V0000.07.00L.N1129'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '7.0'
+      OperatingSystemVersionMajor          : '7'
+      OperatingSystemNameVersion           : 'Vidaa 7.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 7'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '100.0'
+      LayoutEngineVersionMajor             : '100'
+      LayoutEngineNameVersion              : 'Blink 100.0'
+      LayoutEngineNameVersionMajor         : 'Blink 100'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '100.4896.4.10'
+      AgentVersionMajor                    : '100'
+      AgentNameVersion                     : 'HiBrowser 100.4896.4.10'
+      AgentNameVersionMajor                : 'HiBrowser 100'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.146 Odin/111.5563.5.1 Safari/537.36 Model/VIDAA-MTK9618 VIDAA/7.0(Hisense;SmartTV;100Q60QAVS;MTK9618/V0000.08.52B.P0217;UHD;100Q60QA;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense 100Q60QAVS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'MTK9618/V0000.08.52B.P0217'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '7.0'
+      OperatingSystemVersionMajor          : '7'
+      OperatingSystemNameVersion           : 'Vidaa 7.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 7'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '111.0'
+      LayoutEngineVersionMajor             : '111'
+      LayoutEngineNameVersion              : 'Blink 111.0'
+      LayoutEngineNameVersionMajor         : 'Blink 111'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '111.5563.5.1'
+      AgentVersionMajor                    : '111'
+      AgentNameVersion                     : 'HiBrowser 111.5563.5.1'
+      AgentNameVersionMajor                : 'HiBrowser 111'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.146 Odin/111.5563.5.1 Safari/537.36 Model/VIDAA-MTK9618 VIDAA/7.0(Hisense;SmartTV;HL5QPRO;MTK9618/V0000.07.60O.P0311;UHD;M2;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense HL5QPRO'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'MTK9618/V0000.07.60O.P0311'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '7.0'
+      OperatingSystemVersionMajor          : '7'
+      OperatingSystemNameVersion           : 'Vidaa 7.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 7'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '111.0'
+      LayoutEngineVersionMajor             : '111'
+      LayoutEngineNameVersion              : 'Blink 111.0'
+      LayoutEngineNameVersionMajor         : 'Blink 111'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '111.5563.5.1'
+      AgentVersionMajor                    : '111'
+      AgentNameVersion                     : 'HiBrowser 111.5563.5.1'
+      AgentNameVersionMajor                : 'HiBrowser 111'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.146 Odin/111.5563.5.1 Safari/537.36 Model/VIDAA-MTK9618 VIDAA/7.0(Hisense;SmartTV;PL2NE;MTK9618/V0000.07.60B.P0130;UHD;PL2;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense PL2NE'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'MTK9618/V0000.07.60B.P0130'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '7.0'
+      OperatingSystemVersionMajor          : '7'
+      OperatingSystemNameVersion           : 'Vidaa 7.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 7'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '111.0'
+      LayoutEngineVersionMajor             : '111'
+      LayoutEngineNameVersion              : 'Blink 111.0'
+      LayoutEngineNameVersionMajor         : 'Blink 111'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '111.5563.5.1'
+      AgentVersionMajor                    : '111'
+      AgentNameVersion                     : 'HiBrowser 111.5563.5.1'
+      AgentNameVersionMajor                : 'HiBrowser 111'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.146 Odin/111.5563.5.1 Safari/537.36 Model/VIDAA-MTK9618 VIDAA/7.0(LOEWE;SmartTV;32A72FEVS;MTK9618/V0000.07.60L.O1125;FHD;32A7FE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Loewe 32A72FEVS'
+      DeviceBrand                          : 'Loewe'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'MTK9618/V0000.07.60L.O1125'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '7.0'
+      OperatingSystemVersionMajor          : '7'
+      OperatingSystemNameVersion           : 'Vidaa 7.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 7'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '111.0'
+      LayoutEngineVersionMajor             : '111'
+      LayoutEngineNameVersion              : 'Blink 111.0'
+      LayoutEngineNameVersionMajor         : 'Blink 111'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '111.5563.5.1'
+      AgentVersionMajor                    : '111'
+      AgentNameVersion                     : 'HiBrowser 111.5563.5.1'
+      AgentNameVersionMajor                : 'HiBrowser 111'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.146 Odin/111.5563.5.1 Safari/537.36 Model/VIDAA-MTK9618 VIDAA/7.0(LOEWE;SmartTV;65A81FEVS;MTK9618/V0000.07.60D.O1122;UHD;65A8FE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Loewe 65A81FEVS'
+      DeviceBrand                          : 'Loewe'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'MTK9618/V0000.07.60D.O1122'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '7.0'
+      OperatingSystemVersionMajor          : '7'
+      OperatingSystemNameVersion           : 'Vidaa 7.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 7'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '111.0'
+      LayoutEngineVersionMajor             : '111'
+      LayoutEngineNameVersion              : 'Blink 111.0'
+      LayoutEngineNameVersionMajor         : 'Blink 111'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '111.5563.5.1'
+      AgentVersionMajor                    : '111'
+      AgentNameVersion                     : 'HiBrowser 111.5563.5.1'
+      AgentNameVersionMajor                : 'HiBrowser 111'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.146 Odin/111.5563.5.1 Safari/537.36 Model/VIDAA-MTK9618 VIDAA/7.0(We by loewe;SmartTV;55A83LEVS;MTK9618/V0000.07.60B.O0613;UHD;55A8LE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'WE BY Loewe 55A83LEVS'
+      DeviceBrand                          : 'WE BY Loewe'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'MTK9618/V0000.07.60B.O0613'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '7.0'
+      OperatingSystemVersionMajor          : '7'
+      OperatingSystemNameVersion           : 'Vidaa 7.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 7'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '111.0'
+      LayoutEngineVersionMajor             : '111'
+      LayoutEngineNameVersion              : 'Blink 111.0'
+      LayoutEngineNameVersionMajor         : 'Blink 111'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '111.5563.5.1'
+      AgentVersionMajor                    : '111'
+      AgentNameVersion                     : 'HiBrowser 111.5563.5.1'
+      AgentNameVersionMajor                : 'HiBrowser 111'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.146 Odin/111.5563.5.1 Safari/537.36 Model/VIDAA-MTK9618 VIDAA/9.0(Hisense;SmartTV;85U9LEVS;MTK9618/V0000.09.02V.P0915;UHD;85U9LE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense 85U9LEVS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'MTK9618/V0000.09.02V.P0915'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '9.0'
+      OperatingSystemVersionMajor          : '9'
+      OperatingSystemNameVersion           : 'Vidaa 9.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 9'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '111.0'
+      LayoutEngineVersionMajor             : '111'
+      LayoutEngineNameVersion              : 'Blink 111.0'
+      LayoutEngineNameVersionMajor         : 'Blink 111'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '111.5563.5.1'
+      AgentVersionMajor                    : '111'
+      AgentNameVersion                     : 'HiBrowser 111.5563.5.1'
+      AgentNameVersionMajor                : 'HiBrowser 111'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.146 Odin/111.5563.5.1 Safari/537.36 Model/VIDAA-MTK9618 VIDAA/9.0(Hisense;SmartTV;HL7N;MTK9618/V0000.09.01G.P0710;UHD;C2;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense HL7N'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'MTK9618/V0000.09.01G.P0710'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '9.0'
+      OperatingSystemVersionMajor          : '9'
+      OperatingSystemNameVersion           : 'Vidaa 9.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 9'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '111.0'
+      LayoutEngineVersionMajor             : '111'
+      LayoutEngineNameVersion              : 'Blink 111.0'
+      LayoutEngineNameVersionMajor         : 'Blink 111'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '111.5563.5.1'
+      AgentVersionMajor                    : '111'
+      AgentNameVersion                     : 'HiBrowser 111.5563.5.1'
+      AgentNameVersionMajor                : 'HiBrowser 111'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.146 Odin/111.5563.5.1 Safari/537.36 Model/VIDAA-MTK9618 VIDAA/9.0(Hisense;SmartTV;HL7NPRO;MTK9618/V0000.09.01G.P0710;UHD;C2;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense HL7NPRO'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'MTK9618/V0000.09.01G.P0710'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '9.0'
+      OperatingSystemVersionMajor          : '9'
+      OperatingSystemNameVersion           : 'Vidaa 9.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 9'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '111.0'
+      LayoutEngineVersionMajor             : '111'
+      LayoutEngineNameVersion              : 'Blink 111.0'
+      LayoutEngineNameVersionMajor         : 'Blink 111'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '111.5563.5.1'
+      AgentVersionMajor                    : '111'
+      AgentNameVersion                     : 'HiBrowser 111.5563.5.1'
+      AgentNameVersionMajor                : 'HiBrowser 111'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.146 Odin/111.5563.5.1 Safari/537.36 Model/VIDAA-MTK9618 VIDAA/9.0(TOSHIBA;SmartTV;85Z670ME;MTK9618/V0000.09.09O.P0930;UHD;85Z670ME;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Toshiba 85Z670ME'
+      DeviceBrand                          : 'Toshiba'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'MTK9618/V0000.09.09O.P0930'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '9.0'
+      OperatingSystemVersionMajor          : '9'
+      OperatingSystemNameVersion           : 'Vidaa 9.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 9'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '111.0'
+      LayoutEngineVersionMajor             : '111'
+      LayoutEngineNameVersion              : 'Blink 111.0'
+      LayoutEngineNameVersionMajor         : 'Blink 111'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '111.5563.5.1'
+      AgentVersionMajor                    : '111'
+      AgentNameVersion                     : 'HiBrowser 111.5563.5.1'
+      AgentNameVersionMajor                : 'HiBrowser 111'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.146 Odin/111.5563.5.1 Safari/537.36 Model/VIDAA-MTK9655 VIDAA/9.0(Hisense;SmartTV;100U70QEVS;MTK9655/V0000.09.02E.P0820;UHD;100U7QE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense 100U70QEVS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'MTK9655/V0000.09.02E.P0820'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '9.0'
+      OperatingSystemVersionMajor          : '9'
+      OperatingSystemNameVersion           : 'Vidaa 9.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 9'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '111.0'
+      LayoutEngineVersionMajor             : '111'
+      LayoutEngineNameVersion              : 'Blink 111.0'
+      LayoutEngineNameVersionMajor         : 'Blink 111'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '111.5563.5.1'
+      AgentVersionMajor                    : '111'
+      AgentNameVersion                     : 'HiBrowser 111.5563.5.1'
+      AgentNameVersionMajor                : 'HiBrowser 111'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.146 Odin/111.5563.5.1 Safari/537.36 Model/VIDAA-NT72690 VIDAA/7.0(Hisense;SmartTV;32A40QEVS;NT72690/V0000.08.52S.O1205;HD;32A3HE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense 32A40QEVS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'NT72690/V0000.08.52S.O1205'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '7.0'
+      OperatingSystemVersionMajor          : '7'
+      OperatingSystemNameVersion           : 'Vidaa 7.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 7'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '111.0'
+      LayoutEngineVersionMajor             : '111'
+      LayoutEngineNameVersion              : 'Blink 111.0'
+      LayoutEngineNameVersionMajor         : 'Blink 111'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '111.5563.5.1'
+      AgentVersionMajor                    : '111'
+      AgentNameVersion                     : 'HiBrowser 111.5563.5.1'
+      AgentNameVersionMajor                : 'HiBrowser 111'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.146 Odin/111.5563.5.1 Safari/537.36 Model/VIDAA-NT72690 VIDAA/7.0(Hisense;SmartTV;40A35HEVS;NT72690/V0000.08.50U.O0903;FHD;40A3HE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense 40A35HEVS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'AArch64'
+      DeviceCpuBits                        : '64'
+      DeviceVersion                        : 'NT72690/V0000.08.50U.O0903'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '7.0'
+      OperatingSystemVersionMajor          : '7'
+      OperatingSystemNameVersion           : 'Vidaa 7.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 7'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '111.0'
+      LayoutEngineVersionMajor             : '111'
+      LayoutEngineNameVersion              : 'Blink 111.0'
+      LayoutEngineNameVersionMajor         : 'Blink 111'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '111.5563.5.1'
+      AgentVersionMajor                    : '111'
+      AgentNameVersion                     : 'HiBrowser 111.5563.5.1'
+      AgentNameVersionMajor                : 'HiBrowser 111'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Odin/100.4896.4.10 Safari/537.36 Model/VIDAA-MT9602 VIDAA/7.0(Hisense;SmartTV;43A53FEVS;MTK9602/V0000.07.51O.O0226;UHD;43A5FE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense 43A53FEVS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'MTK9602/V0000.07.51O.O0226'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '7.0'
+      OperatingSystemVersionMajor          : '7'
+      OperatingSystemNameVersion           : 'Vidaa 7.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 7'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '100.0'
+      LayoutEngineVersionMajor             : '100'
+      LayoutEngineNameVersion              : 'Blink 100.0'
+      LayoutEngineNameVersionMajor         : 'Blink 100'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '100.4896.4.10'
+      AgentVersionMajor                    : '100'
+      AgentNameVersion                     : 'HiBrowser 100.4896.4.10'
+      AgentNameVersionMajor                : 'HiBrowser 100'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.146 Odin/111.5563.5.1 Safari/537.36 Model/VIDAA-MT9602 VIDAA/9.0(TOSHIBA;SmartTV;32V35KE;MTK9602/V0000.09.09E.P0930;HD;32V35KE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Toshiba 32V35KE'
+      DeviceBrand                          : 'Toshiba'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'MTK9602/V0000.09.09E.P0930'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '9.0'
+      OperatingSystemVersionMajor          : '9'
+      OperatingSystemNameVersion           : 'Vidaa 9.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 9'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '111.0'
+      LayoutEngineVersionMajor             : '111'
+      LayoutEngineNameVersion              : 'Blink 111.0'
+      LayoutEngineNameVersionMajor         : 'Blink 111'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '111.5563.5.1'
+      AgentVersionMajor                    : '111'
+      AgentNameVersion                     : 'HiBrowser 111.5563.5.1'
+      AgentNameVersionMajor                : 'HiBrowser 111'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.5563.146 Odin/111.5563.5.1 Safari/537.36 Model/VIDAA-MT9602 VIDAA/9.0(Welcome;SmartTV;32A35EEVS;MTK9602/V0000.09.09E.P0930;HD;32A3EE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Welcome 32A35EEVS'
+      DeviceBrand                          : 'Welcome'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'MTK9602/V0000.09.09E.P0930'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '9.0'
+      OperatingSystemVersionMajor          : '9'
+      OperatingSystemNameVersion           : 'Vidaa 9.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 9'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '111.0'
+      LayoutEngineVersionMajor             : '111'
+      LayoutEngineNameVersion              : 'Blink 111.0'
+      LayoutEngineNameVersionMajor         : 'Blink 111'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '111.5563.5.1'
+      AgentVersionMajor                    : '111'
+      AgentNameVersion                     : 'HiBrowser 111.5563.5.1'
+      AgentNameVersionMajor                : 'HiBrowser 111'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Odin/88.4324.2.10 Safari/537.36 Model/Hisense-MT9602 VIDAA/6.0(Hisense;SmartTV;43A53FEVS;MTK9602/V0000.06.10D.M1211;UHD;MTK_DEV_EU_4K;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Hisense 43A53FEVS'
+      DeviceBrand                          : 'Hisense'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'MTK9602/V0000.06.10D.M1211'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '6.0'
+      OperatingSystemVersionMajor          : '6'
+      OperatingSystemNameVersion           : 'Vidaa 6.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 6'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '88.0'
+      LayoutEngineVersionMajor             : '88'
+      LayoutEngineNameVersion              : 'Blink 88.0'
+      LayoutEngineNameVersionMajor         : 'Blink 88'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '88.4324.2.10'
+      AgentVersionMajor                    : '88'
+      AgentNameVersion                     : 'HiBrowser 88.4324.2.10'
+      AgentNameVersionMajor                : 'HiBrowser 88'
+
+
+- test:
+    input:
+      User-Agent                           : 'Mozilla/5.0 (X11; Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Odin/88.4324.2.10 Safari/537.36 Model/Hisense-MT9602 VIDAA/6.0(Welcome;SmartTV;32A35EEVS;MTK9602/V0000.06.39U.P0307;HD;32A3EE;)'
+    expected:
+      DeviceClass                          : 'TV'
+      DeviceName                           : 'Welcome 32A35EEVS'
+      DeviceBrand                          : 'Welcome'
+      DeviceCpu                            : 'ARMv7l'
+      DeviceCpuBits                        : '32'
+      DeviceVersion                        : 'MTK9602/V0000.06.39U.P0307'
+      OperatingSystemClass                 : 'Embedded'
+      OperatingSystemName                  : 'Vidaa'
+      OperatingSystemVersion               : '6.0'
+      OperatingSystemVersionMajor          : '6'
+      OperatingSystemNameVersion           : 'Vidaa 6.0'
+      OperatingSystemNameVersionMajor      : 'Vidaa 6'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '88.0'
+      LayoutEngineVersionMajor             : '88'
+      LayoutEngineNameVersion              : 'Blink 88.0'
+      LayoutEngineNameVersionMajor         : 'Blink 88'
+      AgentClass                           : 'Browser'
+      AgentName                            : 'HiBrowser'
+      AgentVersion                         : '88.4324.2.10'
+      AgentVersionMajor                    : '88'
+      AgentNameVersion                     : 'HiBrowser 88.4324.2.10'
+      AgentNameVersionMajor                : 'HiBrowser 88'
