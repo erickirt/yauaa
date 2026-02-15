@@ -6,7 +6,7 @@ NEXT RELEASE
 - UDFs;
   - Nifi UDF works on Nifi 1.28.1 and Nifi 2.8.0
 - New/improved detections:
-  - Robots: OpenAI, Palo Alto Networks
+  - Robots: OpenAI, Palo Alto Networks, Gitlab Kubernetes Agent Service
   - Apps: KakaoTalk, Bitwarden
   - Hisense HiBrowser, Sraf Browser and Hisense Vidaa platform running on TVs of several brands.
 

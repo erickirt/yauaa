@@ -53,6 +53,7 @@ config:
       'Fedidb'                       : 'Fedidb|Fedidb Crawler'
       'feeder.co'                    : 'Feeder.co|Feeder.co bot'
       'gitlab-runner'                : 'Gitlab|Gitlab CI Runner'
+      'gitlab-kas'                   : 'Gitlab|Gitlab Kubernetes Agent Service'
       'GnowitNewsbot'                : 'Gnowit|Gnowit Newsbot'
       'gocrawl'                      : 'GoCrawl|GoCrawl'
       'Guzzle'                       : 'Guzzle|Guzzle'
@@ -13655,6 +13656,34 @@ config:
       AgentVersionMajor                    : '17'
       AgentNameVersion                     : 'Gitlab CI Runner 17.10.0'
       AgentNameVersionMajor                : 'Gitlab CI Runner 17'
+
+# Gitlab Kubernetes Agent Service
+- test:
+    input:
+      User-Agent: 'gitlab-kas/v18.8.0/v18.8.0'
+    expected:
+      DeviceClass                          : 'Robot'
+      DeviceName                           : 'Gitlab Kubernetes Agent Service'
+      DeviceBrand                          : 'Gitlab'
+      OperatingSystemClass                 : 'Cloud'
+      OperatingSystemName                  : 'Cloud'
+      OperatingSystemVersion               : '??'
+      OperatingSystemVersionMajor          : '??'
+      OperatingSystemNameVersion           : 'Cloud ??'
+      OperatingSystemNameVersionMajor      : 'Cloud ??'
+      LayoutEngineClass                    : 'Robot'
+      LayoutEngineName                     : 'Gitlab Kubernetes Agent Service'
+      LayoutEngineVersion                  : 'v18.8.0'
+      LayoutEngineVersionMajor             : 'v18'
+      LayoutEngineNameVersion              : 'Gitlab Kubernetes Agent Service v18.8.0'
+      LayoutEngineNameVersionMajor         : 'Gitlab Kubernetes Agent Service v18'
+      AgentClass                           : 'Robot'
+      AgentName                            : 'Gitlab Kubernetes Agent Service'
+      AgentVersion                         : 'v18.8.0'
+      AgentVersionMajor                    : 'v18'
+      AgentNameVersion                     : 'Gitlab Kubernetes Agent Service v18.8.0'
+      AgentNameVersionMajor                : 'Gitlab Kubernetes Agent Service v18'
+
 
 
 - test:
