@@ -6753,9 +6753,9 @@ config:
 - matcher:
     require:
     - 'agent.(1)product.(1)name="Bitwarden_Mobile"'
-    - 'agent.(1)product.(1)comments.entry.product.name="Android"'
+    - 'agent.(1)product.comments.entry.product.name="Android"'
     variable:
-    - 'ModelTag : agent.(1)product.(1)comments.entry[1]="Model"@[2-]'
+    - 'ModelTag : agent.(1)product.comments.entry[1]="Model"@[2-]'
     extract:
     - 'DeviceClass  :   1                       : "Mobile"'
     - 'DeviceName   : 500                       : @ModelTag'
@@ -6769,8 +6769,8 @@ config:
     require:
     - 'agent.(1)product.(1)name="Bitwarden_Mobile"'
     variable:
-    - 'AppleTag               : agent.(1)product.(1)comments.entry[1]="Model"@[2-]'
-    - 'iOSVersion             : agent.(1)product.(1)comments.entry.product.name="iOS"^.version'
+    - 'AppleTag               : agent.(1)product.comments.entry[1]="Model"@[2-]'
+    - 'iOSVersion             : agent.(1)product.comments.entry.product.name="iOS"^.version'
     extract:
     - 'DeviceClass            :   500 : LookUp[AppleDeviceClass;@AppleTag]'
     - 'DeviceBrand            :   500 : "Apple"'
@@ -6788,8 +6788,8 @@ config:
     require:
     - 'agent.(1)product.(1)name="Bitwarden_Mobile"'
     variable:
-    - 'AppleTag               : agent.(1)product.(1)comments.entry[1]="Model"@[2-]'
-    - 'iOSVersion             : agent.(1)product.(1)comments.entry.product.name="iOS"^.version'
+    - 'AppleTag               : agent.(1)product.comments.entry[1]="Model"@[2-]'
+    - 'iOSVersion             : agent.(1)product.comments.entry.product.name="iOS"^.version'
     extract:
     - 'DeviceClass            :   501 : LookUp[AppleDeviceClass;@AppleTag]'
     - 'DeviceBrand            :   501 : "Apple"'
@@ -6962,6 +6962,60 @@ config:
       AgentVersionMajor                    : '2023'
       AgentNameVersion                     : 'Bitwarden Mobile 2023.5.0'
       AgentNameVersionMajor                : 'Bitwarden Mobile 2023'
+
+
+- test:
+    input:
+      User-Agent                           : 'Bitwarden_Mobile/2026.1.0 (release/standard) (Android 16; SDK 36; Model SM-S901B)'
+    expected:
+      DeviceClass                          : 'Mobile'
+      DeviceName                           : 'Samsung SM-S901B'
+      DeviceBrand                          : 'Samsung'
+      OperatingSystemClass                 : 'Mobile'
+      OperatingSystemName                  : 'Android'
+      OperatingSystemVersion               : '16'
+      OperatingSystemVersionMajor          : '16'
+      OperatingSystemNameVersion           : 'Android 16'
+      OperatingSystemNameVersionMajor      : 'Android 16'
+      LayoutEngineClass                    : 'Unknown'
+      LayoutEngineName                     : 'Unknown'
+      LayoutEngineVersion                  : '??'
+      LayoutEngineVersionMajor             : '??'
+      LayoutEngineNameVersion              : 'Unknown ??'
+      LayoutEngineNameVersionMajor         : 'Unknown ??'
+      AgentClass                           : 'Mobile App'
+      AgentName                            : 'Bitwarden Mobile'
+      AgentVersion                         : '2026.1.0'
+      AgentVersionMajor                    : '2026'
+      AgentNameVersion                     : 'Bitwarden Mobile 2026.1.0'
+      AgentNameVersionMajor                : 'Bitwarden Mobile 2026'
+
+
+- test:
+    input:
+      User-Agent                           : 'Bitwarden_Mobile/2026.1.1 (release/standard) (Android 15; SDK 35; Model Fairphone 6)'
+    expected:
+      DeviceClass                          : 'Mobile'
+      DeviceName                           : 'Fairphone 6'
+      DeviceBrand                          : 'Fairphone'
+      OperatingSystemClass                 : 'Mobile'
+      OperatingSystemName                  : 'Android'
+      OperatingSystemVersion               : '15'
+      OperatingSystemVersionMajor          : '15'
+      OperatingSystemNameVersion           : 'Android 15'
+      OperatingSystemNameVersionMajor      : 'Android 15'
+      LayoutEngineClass                    : 'Unknown'
+      LayoutEngineName                     : 'Unknown'
+      LayoutEngineVersion                  : '??'
+      LayoutEngineVersionMajor             : '??'
+      LayoutEngineNameVersion              : 'Unknown ??'
+      LayoutEngineNameVersionMajor         : 'Unknown ??'
+      AgentClass                           : 'Mobile App'
+      AgentName                            : 'Bitwarden Mobile'
+      AgentVersion                         : '2026.1.1'
+      AgentVersionMajor                    : '2026'
+      AgentNameVersion                     : 'Bitwarden Mobile 2026.1.1'
+      AgentNameVersionMajor                : 'Bitwarden Mobile 2026'
 
 
 # No real example of iOS available right now.

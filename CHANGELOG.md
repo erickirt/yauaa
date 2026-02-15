@@ -7,7 +7,7 @@ NEXT RELEASE
   - Nifi UDF works on Nifi 1.28.1 and Nifi 2.8.0
 - New/improved detections:
   - Robots: OpenAI
-  - KakaoTalk
+  - Apps: KakaoTalk, Bitwarden
   - Hisense HiBrowser, Sraf Browser and Hisense Vidaa platform running on TVs of several brands.
 
 v8.0.0
