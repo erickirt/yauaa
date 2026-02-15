@@ -649,17 +649,12 @@ config:
       LayoutEngineVersionMajor             : '47'
       LayoutEngineNameVersion              : 'Blink 47.0'
       LayoutEngineNameVersionMajor         : 'Blink 47'
-      AgentClass                           : 'Browser Webview'
-      AgentName                            : 'Chrome Webview'
-      AgentVersion                         : '47.0.2526.100'
-      AgentVersionMajor                    : '47'
-      AgentNameVersion                     : 'Chrome Webview 47.0.2526.100'
-      AgentNameVersionMajor                : 'Chrome Webview 47'
-      WebviewAppName                       : 'Kakaotalk'
-      WebviewAppVersion                    : '1400218'
-      WebviewAppVersionMajor               : '1400218'
-      WebviewAppNameVersion                : 'Kakaotalk 1400218'
-      WebviewAppNameVersionMajor           : 'Kakaotalk 1400218'
+      AgentClass                           : 'Mobile App'
+      AgentName                            : 'KakaoTalk'
+      AgentVersion                         : '1400218'
+      AgentVersionMajor                    : '1400218'
+      AgentNameVersion                     : 'KakaoTalk 1400218'
+      AgentNameVersionMajor                : 'KakaoTalk 1400218'
 
 - test:
     input:

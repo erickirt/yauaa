@@ -7,6 +7,7 @@ NEXT RELEASE
   - Nifi UDF works on Nifi 1.28.1 and Nifi 2.8.0
 - New/improved detections:
   - Robots: OpenAI
+  - KakaoTalk
 
 v8.0.0
 ===

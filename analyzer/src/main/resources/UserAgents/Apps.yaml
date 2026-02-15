@@ -146,6 +146,7 @@ config:
       'GeminiiOS'                                   : 'Mobile App|Google Gemini'
 
       'com.aftership.AfterShip'                     : 'Mobile App|AfterShip'
+      'KAKAOTALK'                                   : 'Mobile App|KakaoTalk'
 
 - matcher:
     variable:
@@ -6690,6 +6691,63 @@ config:
       AgentVersionMajor                    : '2'
       AgentNameVersion                     : 'WhatsApp 2.2306.4'
       AgentNameVersionMajor                : 'WhatsApp 2'
+
+# KakaoTalk – Korea’s no. 1 messenger
+- test:
+    input:
+      User-Agent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Safari/604.1 Safari/604.1 KAKAOTALK/25.4.2 (INAPP) KAKAOTALK/25.4.2 (INAPP)'
+    expected:
+      DeviceClass                          : 'Phone'
+      DeviceName                           : 'Apple iPhone'
+      DeviceBrand                          : 'Apple'
+      DeviceFirmwareVersion                : '15E148'
+      DeviceVersion                        : 'iPhone'
+      OperatingSystemClass                 : 'Mobile'
+      OperatingSystemName                  : 'iOS'
+      OperatingSystemVersion               : '18.5'
+      OperatingSystemVersionMajor          : '18'
+      OperatingSystemNameVersion           : 'iOS 18.5'
+      OperatingSystemNameVersionMajor      : 'iOS 18'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'AppleWebKit'
+      LayoutEngineVersion                  : '605.1.15'
+      LayoutEngineVersionMajor             : '605'
+      LayoutEngineNameVersion              : 'AppleWebKit 605.1.15'
+      LayoutEngineNameVersionMajor         : 'AppleWebKit 605'
+      AgentClass                           : 'Mobile App'
+      AgentName                            : 'KakaoTalk'
+      AgentVersion                         : '25.4.2'
+      AgentVersionMajor                    : '25'
+      AgentNameVersion                     : 'KakaoTalk 25.4.2'
+      AgentNameVersionMajor                : 'KakaoTalk 25'
+
+# https://play.google.com/store/apps/details?id=com.kakao.talk&hl=en
+- test:
+    input:
+      User-Agent: 'Mozilla/5.0 (Linux; Android 15; SM-S938N Build/AP3A.240905.015.A2; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/137.0.7151.61 Mobile Safari/537.36 KAKAOTALK/25.4.3 (INAPP)'
+    expected:
+      DeviceClass                          : 'Phone'
+      DeviceName                           : 'Samsung SM-S938N'
+      DeviceBrand                          : 'Samsung'
+      OperatingSystemClass                 : 'Mobile'
+      OperatingSystemName                  : 'Android'
+      OperatingSystemVersion               : '15'
+      OperatingSystemVersionMajor          : '15'
+      OperatingSystemNameVersion           : 'Android 15'
+      OperatingSystemNameVersionMajor      : 'Android 15'
+      OperatingSystemVersionBuild          : 'AP3A.240905.015.A2'
+      LayoutEngineClass                    : 'Browser'
+      LayoutEngineName                     : 'Blink'
+      LayoutEngineVersion                  : '137.0'
+      LayoutEngineVersionMajor             : '137'
+      LayoutEngineNameVersion              : 'Blink 137.0'
+      LayoutEngineNameVersionMajor         : 'Blink 137'
+      AgentClass                           : 'Mobile App'
+      AgentName                            : 'KakaoTalk'
+      AgentVersion                         : '25.4.3'
+      AgentVersionMajor                    : '25'
+      AgentNameVersion                     : 'KakaoTalk 25.4.3'
+      AgentNameVersionMajor                : 'KakaoTalk 25'
 
 # Bitwarden Mobile app
 - matcher:
