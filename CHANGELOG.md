@@ -3,7 +3,7 @@ This is intended as an overview of the major changes
 
 NEXT RELEASE
 ===
-- UDFs;
+- UDFs:
   - Nifi UDF works on Nifi 1.28.1 and Nifi 2.8.0
 - New/improved detections:
   - Robots: OpenAI, Palo Alto Networks, Gitlab Kubernetes Agent Service
