@@ -3,6 +3,11 @@ This is intended as an overview of the major changes
 
 NEXT RELEASE
 ===
+- New/improved detections:
+  - ...
+
+v8.1.0
+===
 - UDFs:
   - Nifi UDF works on Nifi 1.28.1 and Nifi 2.8.0
 - New/improved detections:

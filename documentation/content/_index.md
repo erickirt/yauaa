@@ -18,6 +18,10 @@ If you just want to give it a quick try then you can do that with your own brows
 These are only the highlights for the last few releases, the full changelog can be found [here](https://github.com/nielsbasjes/yauaa/blob/main/CHANGELOG.md).
 
 ### NEXT RELEASE
+- New/improved detections:
+  - ...
+
+### Version v8.1.0
 - UDFs:
     - Nifi UDF works on Nifi 1.28.1 and Nifi 2.8.0
 - New/improved detections:
