@@ -228,5 +228,7 @@ echo "git push --tags"
 RELEASEVERSION=$(git describe --abbrev=0| sed 's/^v//')
 echo "docker push \"nielsbasjes/yauaa:${RELEASEVERSION}\""
 echo "docker push \"nielsbasjes/yauaa:latest\""
+echo "docker push \"nielsbasjes/yauaa:${RELEASEVERSION}-native\""
+echo "docker push \"nielsbasjes/yauaa:latest-native\""
 
 # ----------------------------------------------------------------------------------------------------
